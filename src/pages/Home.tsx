@@ -5,6 +5,7 @@ import BookList from '../components/BookList/BookList';
 import { fetchBooks, fetchPopularBooks } from '../api/books';
 import type { Volume } from '../api/types/googleBooks';
 import useDebouncedValue from '../hooks/useDebouncedValue';
+import useBookSuggestions from '../hooks/useBookSuggestions';
 
 export default function Home() {
   const [query, setQuery] = useState<string>('');
@@ -13,6 +14,13 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [showPopular, setShowPopular] = useState<boolean>(true);
+
+  // Autocomplete suggestions
+  const {
+    suggestions: suggestionObjs,
+    loading: loadingSuggestions,
+  } = useBookSuggestions(query, 8);
+  const suggestions = suggestionObjs.map((s) => s.title);
 
   // Carrega livros populares ao inicializar
   useEffect(() => {
@@ -91,10 +99,14 @@ export default function Home() {
   return (
     <section className="mx-auto max-w-7xl">
       <div className="mb-6">
-        <SearchBar 
-          onSearch={handleSearch} 
+        <SearchBar
+          onSearch={handleSearch}
           defaultValue={query}
           onClear={handleClearSearch}
+          onChange={(v) => setQuery(v)}
+          suggestions={suggestions}
+          loadingSuggestions={loadingSuggestions}
+          onSelectSuggestion={(s) => setQuery(s)}
         />
       </div>
 
