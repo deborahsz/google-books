@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import type { Volume } from '../types/googleBooks';
+import type { Volume } from '../api/types/googleBooks';
 import { fetchBooks } from '../api/books';
 import useDebouncedValue from './useDebouncedValue';
 

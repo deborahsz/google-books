@@ -1,7 +1,7 @@
-import type { Volume } from '../../types/googleBooks';
-import { useState, useMemo } from 'react';
-import { Card, CardContent, CardMedia, Typography, Button, Box, Chip } from '@mui/material';
-import { ExpandMore, ExpandLess, Launch } from '@mui/icons-material';
+import type { Volume } from '../../api/types/googleBooks';
+import { useMemo } from 'react';
+import { Card, CardContent, CardMedia, Typography, Chip } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 type Props = {
   volume: Volume;
@@ -26,7 +26,7 @@ function truncate(text: string, max = 200): string {
 }
 
 export default function BookCard({ volume }: Props) {
-  const [expanded, setExpanded] = useState(false);
+  const navigate = useNavigate();
   const cover = useMemo(() => getCoverUrl(volume.volumeInfo.imageLinks), [volume.volumeInfo.imageLinks]);
 
   const rawDesc = volume.volumeInfo.description ?? '';
@@ -37,6 +37,10 @@ export default function BookCard({ volume }: Props) {
     ? volume.volumeInfo.authors.join(', ')
     : 'Autor desconhecido';
 
+  const handleCardClick = () => {
+    navigate(`/book/${volume.id}`, { state: { volume } });
+  };
+
   return (
     <Card 
       sx={{ 
@@ -44,11 +48,13 @@ export default function BookCard({ volume }: Props) {
         display: 'flex', 
         flexDirection: 'column',
         transition: 'all 0.3s ease',
+        cursor: 'pointer',
         '&:hover': {
           transform: 'translateY(-4px)',
           boxShadow: 6
         }
       }}
+      onClick={handleCardClick}
     >
       {cover && (
         <CardMedia
@@ -78,38 +84,13 @@ export default function BookCard({ volume }: Props) {
           sx={{ 
             flexGrow: 1,
             display: '-webkit-box',
-            WebkitLineClamp: expanded ? 'unset' : 3,
+            WebkitLineClamp: 3,
             WebkitBoxOrient: 'vertical',
             overflow: 'hidden'
           }}
         >
-          {expanded ? cleanDesc : shortDesc}
+          {shortDesc}
         </Typography>
-
-        <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', mt: 'auto' }}>
-          <Button
-            size="small"
-            onClick={() => setExpanded((e) => !e)}
-            startIcon={expanded ? <ExpandLess /> : <ExpandMore />}
-            variant="outlined"
-          >
-            {expanded ? 'Menos' : 'Mais'}
-          </Button>
-          
-          {volume.volumeInfo.infoLink && (
-            <Button
-              size="small"
-              href={volume.volumeInfo.infoLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              startIcon={<Launch />}
-              variant="contained"
-              sx={{ ml: 'auto' }}
-            >
-              Detalhes
-            </Button>
-          )}
-        </Box>
       </CardContent>
     </Card>
   );
