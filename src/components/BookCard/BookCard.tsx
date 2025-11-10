@@ -1,7 +1,8 @@
 import type { Volume } from '../../api/types/googleBooks';
 import { useMemo } from 'react';
-import { Card, CardContent, CardMedia, Typography, Chip } from '@mui/material';
+import { Card, CardContent, CardMedia, Typography, Chip, Skeleton } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import React from 'react';
 
 type Props = {
   volume: Volume;
@@ -41,11 +42,23 @@ export default function BookCard({ volume }: Props) {
     navigate(`/book/${volume.id}`, { state: { volume } });
   };
 
+  const [coverLoading, setCoverLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (cover) {
+      const cvr = new Image();
+      cvr.onload = () => setCoverLoading(false);
+      cvr.src = cover.replace('http://', 'https://');
+    }
+  }, [cover]);
+
+
+
   return (
-    <Card 
-      sx={{ 
-        height: '100%', 
-        display: 'flex', 
+    <Card
+      sx={{
+        height: '100%',
+        display: 'flex',
         flexDirection: 'column',
         transition: 'all 0.3s ease',
         cursor: 'pointer',
@@ -56,7 +69,19 @@ export default function BookCard({ volume }: Props) {
       }}
       onClick={handleCardClick}
     >
-      {cover && (
+      {coverLoading ? (
+        <Skeleton
+          variant="rectangular"
+          width="100%"
+          height={240}
+          sx={{
+            borderRadius: 2,
+            boxShadow: 4,
+            display: 'block',
+            bgcolor: 'grey.100'
+          }}
+        />
+      ) : cover && (
         <CardMedia
           component="img"
           height="240"
@@ -71,17 +96,17 @@ export default function BookCard({ volume }: Props) {
           {volume.volumeInfo.title}
         </Typography>
 
-        <Chip 
-          label={authors} 
-          size="small" 
+        <Chip
+          label={authors}
+          size="small"
           variant="outlined"
           sx={{ alignSelf: 'flex-start' }}
         />
 
-        <Typography 
-          variant="body2" 
-          color="text.secondary" 
-          sx={{ 
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
             flexGrow: 1,
             display: '-webkit-box',
             WebkitLineClamp: 3,

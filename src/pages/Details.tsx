@@ -8,10 +8,12 @@ import {
   Chip, 
   Rating,
   Divider,
-  Alert
+  Alert,
+  Skeleton
 } from '@mui/material';
 import { ArrowBack, Launch, MenuBook, CalendarToday, Language, Business } from '@mui/icons-material';
 import type { Volume } from '../api/types/googleBooks';
+import React from 'react';
 
 interface LocationState {
   volume: Volume;
@@ -66,6 +68,16 @@ export default function Details() {
 
   const hasDescription = volumeInfo.description && volumeInfo.description.trim().length > 0;
 
+  const [coverLoading, setCoverLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if(coverUrl) {
+      const cvr = new Image();
+      cvr.onload = () => setCoverLoading(false);
+      cvr.src = coverUrl.replace('http://', 'https://');
+    }
+  }, [coverUrl]);
+
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
       <Button 
@@ -81,39 +93,53 @@ export default function Details() {
         <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 4 }}>
           {/* Coluna da imagem */}
           <Box sx={{ width: { xs: '100%', md: '40%' }, display: 'flex', justifyContent: 'center' }}>
-            {coverUrl ? (
-              <Box
-                component="img"
-                src={coverUrl.replace('http://', 'https://')}
-                alt={`Capa de ${volumeInfo.title}`}
+            {coverLoading ? (
+              <Skeleton
+                variant="rectangular"
+                width="100%"
+                height={400}
                 sx={{
-                  width: '100%',
-                  maxWidth: 350,
                   borderRadius: 2,
                   boxShadow: 4,
-                  display: 'block'
+                  display: 'block',
+                  bgcolor: 'grey.100'
                 }}
               />
-            ) : (
-              <Box
-                sx={{
-                  width: '100%',
-                  height: 400,
-                  bgcolor: 'grey.100',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  borderRadius: 2,
-                  border: '2px dashed',
-                  borderColor: 'grey.300'
-                }}
-              >
-                <Typography color="grey.500" textAlign="center">
-                  📚<br />
-                  Imagem não disponível
-                </Typography>
-              </Box>
-            )}
+            ) :
+              coverUrl ? (
+                <Box
+                  component="img"
+                  src={coverUrl.replace('http://', 'https://')}
+                  alt={`Capa de ${volumeInfo.title}`}
+                  sx={{
+                    width: '100%',
+                    maxWidth: 350,
+                    borderRadius: 2,
+                    boxShadow: 4,
+                    display: 'block'
+                  }}
+                />
+              ) : (
+                <Box
+                  sx={{
+                    width: '100%',
+                    height: 400,
+                    bgcolor: 'grey.100',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    borderRadius: 2,
+                    border: '2px dashed',
+                    borderColor: 'grey.300'
+                  }}
+                >
+                  <Typography color="grey.500" textAlign="center">
+                    📚<br />
+                    Imagem não disponível
+                  </Typography>
+                </Box>
+              )
+            }
           </Box>
 
           {/* Coluna das informações */}
