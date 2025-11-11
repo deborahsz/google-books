@@ -1,10 +1,10 @@
 import type { Volume } from './types/googleBooks';
 
-export async function fetchBooks(query: string, maxResults = 20): Promise<Volume[]> {
+export async function fetchBooks(query: string, maxResults = 20, startIndex = 0): Promise<Volume[]> {
   const q = query?.trim();
   if (!q) return [];
 
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&printType=books&maxResults=${maxResults}`;
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(q)}&printType=books&maxResults=${maxResults}&startIndex=${startIndex}`;
 
   try {
     const res = await fetch(url);
@@ -87,7 +87,7 @@ export async function fetchBooks(query: string, maxResults = 20): Promise<Volume
   }
 }
 
-export async function fetchPopularBooks(maxResults = 20): Promise<Volume[]> {
+export async function fetchPopularBooks(maxResults = 20, startIndex = 0): Promise<Volume[]> {
   const popularQueries = [
     'bestseller',
     'fiction bestseller 2024',
@@ -101,7 +101,7 @@ export async function fetchPopularBooks(maxResults = 20): Promise<Volume[]> {
 
   const randomQuery = popularQueries[Math.floor(Math.random() * popularQueries.length)];
   
-  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(randomQuery)}&printType=books&maxResults=${maxResults}&orderBy=relevance`;
+  const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(randomQuery)}&printType=books&maxResults=${maxResults}&startIndex=${startIndex}&orderBy=relevance`;
 
   try {
     const res = await fetch(url);
